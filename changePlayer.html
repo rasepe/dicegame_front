@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Insert title here</title>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script src="js/dicegame.js"></script>
+</head>
+<body onload="loadIds('playerId')">
+
+		<label for="playerId">Choose one id to update player name</label> <br>
+		<select id="playerId">
+		</select> 
+		<br> 
+		<label for="editName">Enter new name:</label> 
+		<input type="text" id="editName"> 
+		<input class="btn btn-primary" id="submit-button" type="submit" value="Save changes" onclick="updatePlayer()">
+	
+	<p>
+		<a href="http://localhost/dicegame/">BACK TO INDEX</a>
+	</p>
+</body>
+</html>
