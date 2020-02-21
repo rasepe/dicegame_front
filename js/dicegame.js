@@ -1,4 +1,6 @@
 var arrayPlayers = new Array();
+var names = new Array();
+var currentPlayer;
 
 function addNewPlayer() {
 
@@ -22,13 +24,23 @@ function addNewPlayer() {
 		url: "http://localhost:8080/players",
 		data: JSON.stringify(newPlayer),    
 		success: function(data) {
-			console.log("success");
+			console.log(data);
+			printId(data, "printId");
+			//currentPlayer = data;
 		},
 		error: function(){
 			alert("json not found");
 		}
 	});
 
+}
+
+function printId(object) {
+	var name = object.name;
+	if (name == null) {
+		name = "ANONYMOUS";
+	}
+	document.getElementById("printId").innerHTML= "User: " + name + ", created with id: "+ object.id;
 }
 
 
@@ -74,21 +86,19 @@ function manage(objects,playerId) {
 function playNewGame() {
 
 	
-	//var newPictureAuthor = document.getElementById("pictureAuthor").value;
-	//var newPictureName = document.getElementById("pictureName").value;
-	//var newPicturePrice = parseFloat(document.getElementById("picturePrice").value);
-    var currentPlayerId = document.getElementById("playerId")[document.getElementById("playerId").selectedIndex].value;
+    welcome3();
+	
+	var currentPlayer = JSON.parse(localStorage.getItem("currentPlayer"));
+/*    var currentPlayerId = document.getElementById("playerId")[document.getElementById("playerId").selectedIndex].value;
     var currentPlayer;
     for (var i=0; i<arrayPlayers.length; i++) {
     	if (currentPlayerId==arrayPlayers[i].id) {
     		currentPlayer = arrayPlayers[i];
     	}
-    }
+    }*/
 
     console.log(currentPlayer);
-  //  console.log(currentShop.maxPictures);
-   // console.log(currentShop.numPictures);
-   // cleanFieldsNewPlayer();
+ 
 
     
   //  if (currentShop.numPictures < currentShop.maxPictures) {
@@ -96,7 +106,7 @@ function playNewGame() {
     				player: currentPlayer
     		}
 
-    	    var constructedURL = "http://localhost:8080/players/" + currentPlayerId + "/games";
+    	    var constructedURL = "http://localhost:8080/players/" + currentPlayer.id + "/games";
     		console.log(constructedURL);
 
     		$.ajax({
@@ -106,7 +116,8 @@ function playNewGame() {
     			data: JSON.stringify(newGame),  
     			success: function(data) {
     				console.log("success");
-    				location.reload();
+    				//location.reload();
+    				seeDice(data);
     			},
     			error: function(){
     				alert("json not found");
@@ -120,6 +131,42 @@ function playNewGame() {
 
 }
 
+function seeDice(data) {
+	
+	console.log(JSON.stringify(data));
+	printGame(data, "result");
+	
+	//data.dice1;
+	//data.dice2;
+	
+	document.getElementById("result").innerHTML += 
+		 '<video width="320" height="180" autoplay="autoplay" muted="">'
+    +'<source src="L-'+data.dice1+'.webm" type=\'video/webm; codecs="vp8, vorbis"\'>'
+    +'Your browser does not support the video tag.'
+    +'</video>'
+    +'<video width="320" height="180" autoplay="autoplay" muted="">'
+    +'<source src="R-'+data.dice2+'.webm" type=\'video/webm; codecs="vp8, vorbis"\'>'
+    +'Your browser does not support the video tag.'
+    +'</video>'
+	
+}
+
+
+function getDice(num, side) {
+    
+       // var num = Math.floor(Math.random() * 5) + 1;
+        // <source src="L-6.webm" type='video/webm; codecs="vp8, vorbis"'>
+        var code = '<source src="' + side + '-' + num + '.webm" type=\'video/webm; codecs="vp8, vorbis"\'>';
+        document.write(code);
+        document.close();
+    
+}
+
+function printGame(object, id) {
+
+	var result = JSON.stringify(object);
+	document.getElementById(id).innerHTML = result + "<br>";
+}
 
 function seeAllPlayers() {
 
@@ -163,10 +210,10 @@ function print(objects, id) {
 
 function seeGamesByPlayer() {
 
-		
-		var currentPlayerId = document.getElementById("playerId")[document.getElementById("playerId").selectedIndex].value;
+	var currentPlayer = JSON.parse(localStorage.getItem("currentPlayer"));
+		//var currentPlayerId = document.getElementById("playerId")[document.getElementById("playerId").selectedIndex].value;
 
-		var constructedUrl = "http://localhost:8080/players/" + currentPlayerId + "/games";
+		var constructedUrl = "http://localhost:8080/players/" + currentPlayer.id + "/games";
 
 		console.log(constructedUrl);
 
@@ -175,7 +222,7 @@ function seeGamesByPlayer() {
 			url: constructedUrl,
 			success: function(data) {
 
-				print(data, "gameList");
+				printGames(data, "gameList");
 
 			},
 			error: function(){
@@ -187,9 +234,30 @@ function seeGamesByPlayer() {
 
 }
 
+
+function printGames(objects, id) {
+
+	var result = "";
+	if (objects.content.length>0) {
+		for (var i=0; i<objects.content.length; i++) {
+			//if (objects.content[i].name == null) {
+			//	objects.content[i].name = "ANONYMOUS";
+			//};
+			result += JSON.stringify(objects.content[i])+"<br>";
+		}
+
+	}
+	else {
+		result = "NO RESULTS";
+	}
+	document.getElementById(id).innerHTML = result;
+}
+
 function updatePlayer() {
 	
-	var editId = document.getElementById("playerId")[document.getElementById("playerId").selectedIndex].value;
+	var currentPlayer = JSON.parse(localStorage.getItem("currentPlayer"));
+	
+	//var editId = document.getElementById("playerId")[document.getElementById("playerId").selectedIndex].value;
 	var editName = document.getElementById("editName").value;
 	//var editRole = document.getElementById("editRole")[document.getElementById("editRole").selectedIndex].value;
 	//var auth = "Basic " + btoa({usname} + ":" + {password});
@@ -198,17 +266,18 @@ function updatePlayer() {
 			"name": editName
 	}
 
-	editPlayer = JSON.stringify(editPlayer); //'{"id":'+editId+'}';
+	 //'{"id":'+editId+'}';
 
-	var constructedURL = "http://localhost:8080/players/" + editId; //
-
+	var constructedURL = "http://localhost:8080/players/" + currentPlayer.id; //
+	editPlayer = JSON.stringify(editPlayer);
 	$.ajax({
 		type: "PUT",
 		contentType: "application/json",
 		url: constructedURL,
 		data: editPlayer, 
 		success: function(data) {
-
+			localStorage.setItem("currentPlayer", JSON.stringify(data));
+			window.open("http://localhost/dicegame/index_login.html","_self")
 		},
 		error: function(){
 			alert("json not found");
@@ -220,17 +289,17 @@ function updatePlayer() {
 
 function deleteGames() {
 	
-	
-	var currentPlayerId = document.getElementById("playerId")[document.getElementById("playerId").selectedIndex].value;
-	var constructedUrl = "http://localhost:8080/players/" + currentPlayerId + "/games";
+	var currentPlayer = JSON.parse(localStorage.getItem("currentPlayer"));
+	//var currentPlayerId = document.getElementById("playerId")[document.getElementById("playerId").selectedIndex].value;
+	var constructedUrl = "http://localhost:8080/players/" + currentPlayer.id + "/games";
 		
 		$.ajax({
 			type: "DELETE",
 			contentType: "application/json",
 			url: constructedUrl,
-			data: currentPlayerId, 
+			data: currentPlayer.id, 
 			success: function(data) {
-			
+				seeGamesByPlayer();
 
 			},
 			error: function(){
@@ -282,7 +351,8 @@ function seeLoser() {
 		url: constructedUrl,
 		success: function(data) {
 
-			printSingleObject(data, "listPlayers");
+			//printSingleObject(data, "listPlayers");
+			printLosersWinners(data, "listPlayers");
 
 		},
 		error: function(){
@@ -293,9 +363,30 @@ function seeLoser() {
 
 }
 
+function printLosersWinners(objects, id) {
+
+	console.log(JSON.stringify(objects));
+	var result = "";
+	if (objects.length>0) {
+		for (var i=0; i<objects.length; i++) {
+			if (objects[i].name == null) {
+				objects[i].name = "ANONYMOUS";
+			};
+			result += JSON.stringify(objects[i])+"<br>";
+		}
+
+	}
+	else {
+		result = "NO RESULTS";
+	}
+	document.getElementById(id).innerHTML = result;
+}
+
 function printSingleObject(object, id) {
 
-
+	if (object.name == null) {
+		object.name = "ANONYMOUS";
+	};
 	var result = JSON.stringify(object);
 
 document.getElementById(id).innerHTML = result;
@@ -312,7 +403,7 @@ function seeWinner() {
 		url: constructedUrl,
 		success: function(data) {
 
-			printSingleObject(data, "listPlayers");
+			printLosersWinners(data, "listPlayers");
 
 		},
 		error: function(){
@@ -321,4 +412,117 @@ function seeWinner() {
 	});
 
 
+}
+
+function login() {
+	var loginName = document.getElementById("loginName").value;
+	var successful = false;
+	
+	
+	//confronta amb llista usuaris validats
+	
+	for (var i=0; i<arrayPlayers.length; i++) {
+		if (loginName == arrayPlayers[i].name) {
+			//currentPlayer = arrayPlayers[i];
+			//successful = true;
+			localStorage.setItem("currentPlayer", JSON.stringify(arrayPlayers[i]));
+			successful = true;
+		}
+	}
+	
+	
+	//document.write(successful);
+	if (successful) {
+		window.open("http://localhost/dicegame/index_login.html","_self")
+	} else {
+		document.getElementById("noSuchName").innerHTML="User " + loginName + " doesn't exist in our database. Please try again";
+	}
+}
+
+function loadNames() {
+	var constructedUrl = "http://localhost:8080/players/";
+// neteja array jugadors:
+	arrayPlayers=[];
+
+	$.ajax({
+		type: "GET",
+		url: constructedUrl,
+		success: function(data) {
+
+			manageNames(data);
+
+		},
+		error: function(){
+			alert("json not found");
+		}
+	});
+
+
+}
+
+
+function loginId() {
+	var loginId = document.getElementById("loginId").value;
+	var successful = false;
+	
+	
+	//confronta amb llista usuaris validats
+	
+	for (var i=0; i<arrayPlayers.length; i++) {
+		if (loginId == arrayPlayers[i].id) {
+			//currentPlayer = arrayPlayers[i];
+			//successful = true;
+			localStorage.setItem("currentPlayer", JSON.stringify(arrayPlayers[i]));
+			successful = true;
+		}
+	}
+	
+	
+	//document.write(successful);
+	if (successful) {
+		window.open("http://localhost/dicegame/index_login.html","_self")
+	} else {
+		document.getElementById("noSuchId").innerHTML="User wit Id " + loginId + " doesn't exist in our database. Please try again";
+	}
+}
+
+function manageNames(objects) {
+	
+	for (var i=0; i<objects.content.length; i++) {
+		arrayPlayers.push(objects.content[i]);
+	}
+	//document.getElementById(playerId).innerHTML = options;
+	
+}
+
+function welcome2() {
+
+var currentPlayer = JSON.parse(localStorage.getItem("currentPlayer"));
+console.log("currentplaer:" + currentPlayer);
+var name = currentPlayer.name;
+if (name==null) {
+	name = "ANONYMOUS";
+} 
+
+	document.getElementById("welcome").innerHTML="Welcome, " + name + "!";
+
+}
+
+
+function welcome3() {
+
+	var currentPlayer = JSON.parse(localStorage.getItem("currentPlayer"));
+	console.log("currentplaer:" + currentPlayer);
+	var name = currentPlayer.name;
+	if (name==null) {
+		name = "ANONYMOUS";
+	} 
+
+		document.getElementById("welcome3").innerHTML="Player: " + name;
+
+	}
+
+function logout() {
+	localStorage.removeItem("currentPlayer");
+	window.open("http://localhost/dicegame/","_self")
 }
