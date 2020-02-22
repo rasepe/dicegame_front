@@ -75,9 +75,9 @@ function loadIds(playerId) {
 
 function manage(objects,playerId) {
 	var options;
-	for (var i=0; i<objects.content.length; i++) {
-		options += '<option value="'+objects.content[i].id+'">'+objects.content[i].id+'</option>';	
-		arrayPlayers.push(objects.content[i]);
+	for (var i=0; i<objects.length; i++) { //.content
+		options += '<option value="'+objects[i].id+'">'+objects[i].id+'</option>';	 //.content
+		arrayPlayers.push(objects[i]); //.content
 	}
 	document.getElementById(playerId).innerHTML = options;
 }
@@ -178,7 +178,7 @@ function seeAllPlayers() {
 		url: constructedUrl,
 		success: function(data) {
 
-			print(data, "listPlayers");
+			print(data, "showList");
 
 		},
 		error: function(){
@@ -193,12 +193,12 @@ function seeAllPlayers() {
 function print(objects, id) {
 
 	var result = "";
-	if (objects.content.length>0) {
-		for (var i=0; i<objects.content.length; i++) {
-			if (objects.content[i].name == null) {
-				objects.content[i].name = "ANONYMOUS";
+	if (objects.length>0) {   //.content
+		for (var i=0; i<objects.length; i++) { //.content
+			if (objects[i].name == null) {  //.content
+				objects[i].name = "ANONYMOUS";   //.content
 			};
-			result += JSON.stringify(objects.content[i])+"<br>";
+			result += JSON.stringify(objects[i])+"<br>";   //.content
 		}
 
 	}
@@ -222,7 +222,7 @@ function seeGamesByPlayer() {
 			url: constructedUrl,
 			success: function(data) {
 
-				printGames(data, "gameList");
+				printGames(data, "showList");
 
 			},
 			error: function(){
@@ -238,12 +238,12 @@ function seeGamesByPlayer() {
 function printGames(objects, id) {
 
 	var result = "";
-	if (objects.content.length>0) {
-		for (var i=0; i<objects.content.length; i++) {
+	if (objects.content.length>0) { //.content
+		for (var i=0; i<objects.content.length; i++) {   //.content
 			//if (objects.content[i].name == null) {
 			//	objects.content[i].name = "ANONYMOUS";
 			//};
-			result += JSON.stringify(objects.content[i])+"<br>";
+			result += JSON.stringify(objects.content[i])+"<br>"; //.content
 		}
 
 	}
@@ -322,7 +322,7 @@ function seeAverage() {
 		url: constructedUrl,
 		success: function(data) {
 
-			printAverage(data, "listPlayers");
+			printAverage(data, "showList");
 
 		},
 		error: function(){
@@ -351,8 +351,8 @@ function seeLoser() {
 		url: constructedUrl,
 		success: function(data) {
 
-			//printSingleObject(data, "listPlayers");
-			printLosersWinners(data, "listPlayers");
+			//printSingleObject(data, "showList");
+			printLosersWinners(data, "showList");
 
 		},
 		error: function(){
@@ -403,7 +403,7 @@ function seeWinner() {
 		url: constructedUrl,
 		success: function(data) {
 
-			printLosersWinners(data, "listPlayers");
+			printLosersWinners(data, "showList");
 
 		},
 		error: function(){
@@ -488,8 +488,8 @@ function loginId() {
 
 function manageNames(objects) {
 	
-	for (var i=0; i<objects.content.length; i++) {
-		arrayPlayers.push(objects.content[i]);
+	for (var i=0; i<objects.length; i++) { //content.
+		arrayPlayers.push(objects[i]); //.content
 	}
 	//document.getElementById(playerId).innerHTML = options;
 	
