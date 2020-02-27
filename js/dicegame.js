@@ -238,12 +238,12 @@ function seeGamesByPlayer() {
 function printGames(objects, id) {
 
 	var result = "";
-	if (objects.content.length>0) { //.content
-		for (var i=0; i<objects.content.length; i++) {   //.content
+	if (objects.length>0) { //.content
+		for (var i=0; i<objects.length; i++) {   //.content
 			//if (objects.content[i].name == null) {
 			//	objects.content[i].name = "ANONYMOUS";
 			//};
-			result += JSON.stringify(objects.content[i])+"<br>"; //.content
+			result += JSON.stringify(objects[i])+"<br>"; //.content
 		}
 
 	}
